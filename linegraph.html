@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>1818 Visualization</title>
+    <script src="libs/d3.v3.min.js"></script>
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/jquery-ui-1.10.4.custom.js"></script>
+    <link rel = "stylesheet" href="/css/smoothness/jquery-ui-1.10.4.custom.css">
+    <style>
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: lightgrey; }
+        .axis text {
+            fill: steelblue;
+        }
+
+        .dataArea {
+            stroke: 1px steelblue;
+            fill: none;
+            fill-opacity:0.5;
+            clip-path: url(#clip);
+        }
+
+        #vis {
+            width: 1000px;
+            margin: 0px;
+        }
+
+        #details {
+            position: absolute;
+            bottom: 50px;
+            left: 100px;
+        }
+
+        .input_golf{
+            position: absolute;
+            bottom: 100px;
+            left: 400px;
+        }
+
+        .choose_mode{
+            position: absolute;
+            bottom: 100px;
+            left: 900px;
+        }
+
+
+    </style>
+
+</head>
+<body>
+    <div id="vis"></div>
+
+    <div id="details">Hover over a golfer for more info</div>
+
+    <div class="ui-widget input_golf">
+        <label for="golfer_input">Golfer: </label>
+        <input id="golfer_input">
+        <button id="show_golfer">Show</button>
+    </div>
+
+    <div class="choose_mode">
+        <label for="mode">View: </label>
+        <select id="mode">
+            <option selected value="score_change">change after cut</option>
+            <option value="total">total score</option> 
+            <option value="day1">day 1 score</option> 
+            <option value="day2">day 2 score</option> 
+            <option value="day3">day 3 score</option> 
+            <option value="day4">day 4 score</option> 
+        </select>
+    </div>
+
+
+	<script src = "linegraph.js"></script>
+
+
+</body>
+</html>

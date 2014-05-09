@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script src="libs/jquery-1.10.1.js"></script>
+    <script src="libs/jquery.xdomainajax.js"></script>
+    <script src="libs/d3.v3.min.js"></script>
+    <script src="libs/FileSaver.js"></script>
+</head>
+<body>
+
+<script>
+
+    legend = {
+      "Masters" : [
+        {"Year" : 2005, "tournament" : 210, "players" : {}},
+        {"Year" : 2006, "tournament" : 261, "players" : {}},
+        {"Year" : 2007, "tournament" : 309, "players" : {}},
+        {"Year" : 2008, "tournament" : 425, "players" : {}},
+        {"Year" : 2009, "tournament" : 537, "players" : {}},
+        {"Year" : 2010, "tournament" : 774, "players" : {}},
+        {"Year" : 2011, "tournament" : 980, "players" : {}},
+        {"Year" : 2012, "tournament" : 1005, "players" : {}},
+        {"Year" : 2013, "tournament" : 1192, "players" : {}},
+      ],
+      "US Open" : [
+        {"Year" : 2005, "tournament" : 219, "players" : {}},
+        {"Year" : 2006, "tournament" : 269, "players" : {}},
+        {"Year" : 2007, "tournament" : 316, "players" : {}},
+        {"Year" : 2008, "tournament" : 433, "players" : {}},
+        {"Year" : 2009, "tournament" : 545, "players" : {}},
+        {"Year" : 2010, "tournament" : 797, "players" : {}},
+        {"Year" : 2011, "tournament" : 981, "players" : {}},
+        {"Year" : 2012, "tournament" : 1013, "players" : {}},
+        {"Year" : 2013, "tournament" : 1200, "players" : {}},
+      ], 
+      "British Open" : [
+        {"Year" : 2005, "tournament" : 223, "players" : {}},
+        {"Year" : 2006, "tournament" : 295, "players" : {}},
+        {"Year" : 2007, "tournament" : 320, "players" : {}},
+        {"Year" : 2008, "tournament" : 411, "players" : {}},
+        {"Year" : 2009, "tournament" : 549, "players" : {}},
+        {"Year" : 2010, "tournament" : 798, "players" : {}},
+        {"Year" : 2011, "tournament" : 982, "players" : {}},
+        {"Year" : 2012, "tournament" : 1017, "players" : {}},
+        {"Year" : 2013, "tournament" : 1204, "players" : {}},
+      ], 
+      "PGA Championship" : [
+        {"Year" : 2005, "tournament" : 226, "players" : {}},
+        {"Year" : 2006, "tournament" : 274, "players" : {}},
+        {"Year" : 2007, "tournament" : 322, "players" : {}},
+        {"Year" : 2008, "tournament" : 439, "players" : {}},
+        {"Year" : 2009, "tournament" : 551, "players" : {}},
+        {"Year" : 2010, "tournament" : 799, "players" : {}},
+        {"Year" : 2011, "tournament" : 983, "players" : {}},
+        {"Year" : 2012, "tournament" : 1018, "players" : {}},
+        {"Year" : 2013, "tournament" : 1206, "players" : {}},
+      ], 
+    }
+    total_num_players = 0;
+
+    function get_tournament(year, name, code){
+      $.ajax({
+          url: "http://espn.go.com/golf/leaderboard?tournamentId=" + code,
+          type: 'GET',
+          cache: false,
+          success: function(data) {
+              var root,allData, body, table;
+              root = $("<div></div>")
+              root.html(data.responseText)
+              var table = root.find("table.tablehead.leaderboard");
+              var rows = table.find("tr.sl");
+              num_players += rows.length - 1; 
+              $.each(rows, function(index, value) {
+
+                  // first row
+
+                  if (index != 0){
+                    cells = $(value).find("td");
+                    name_cell = $(cells[2]).find("a");
+                    
+                    player_name = name_cell.text().replace(/\,/g,"");
+                    legend[name][year - 2005]["players"][player_name] = {};
+
+                    legend[name][year - 2005]["players"][player_name]["day1"] = $(cells[4]).text().trim();
+                    legend[name][year - 2005]["players"][player_name]["day2"] = $(cells[5]).text().trim();
+                    legend[name][year - 2005]["players"][player_name]["day3"] = $(cells[6]).text().trim();
+                    legend[name][year - 2005]["players"][player_name]["day4"] = $(cells[7]).text().trim();
+                    legend[name][year - 2005]["players"][player_name]["total"] = $(cells[8]).text().trim();
+
+                    player_code = name_cell.attr("name");
+                    fetch_player_data(year, name, code, player_code, player_name);
+
+                }
+
+              });
+          num_tournaments--;
+
+          if (num_tournaments == 0 && num_players == 0)
+                print_rows(legend);
+          },
+          error: function() {
+              return console.log("error");
+          }
+      });
+    }
+
+    function fetch_player_data(year, name, code, player_code, player_name){
+      if (total_num_players >= 100){
+        return;
+      }
+      $.ajax({
+          url: "http://espn.go.com/golf/leaderboard11/controllers/ajax/playerDropdown?xhr=1&playerId=" + player_code + "&tournamentId=" + code,
+          type: 'GET',
+          cache: false,
+          success: function(data) {
+              var root,allData, body, table;
+              root = $("<div></div>")
+              root.html(data.responseText)
+
+              // bio stuff
+              bio = root.find("ul.bio")
+              bio_cells = bio.find("li"); 
+              age = $(bio_cells[2]).find("span").text().trim(); 
+
+              legend[name][year-2005]["players"][player_name]["age"] = age ? age - (2014 - year) : "-"; 
+
+              // stat stuff
+              stats = root.find("table");
+              row = stats.find("tr.stat");
+              cells = row.find("td");
+              legend[name][year-2005]["players"][player_name]["DrivingDistance"] = $(cells[1]).text().trim() || "-";
+              legend[name][year-2005]["players"][player_name]["DrivingAccuracy"] = $(cells[2]).text().trim() || "-";
+              legend[name][year-2005]["players"][player_name]["GIR"] = $(cells[3]).text().trim() || "-";
+              legend[name][year-2005]["players"][player_name]["Eagles"] = $(cells[6]).text().trim() || "-";
+              legend[name][year-2005]["players"][player_name]["Birdies"] = $(cells[7]).text().trim() || "-";
+              legend[name][year-2005]["players"][player_name]["Bogeys"] = $(cells[8]).text().trim() || "-";
+
+              num_players--; 
+              total_num_players++;
+              if (total_num_players % 100 == 0)
+                console.log(total_num_players);
+
+              if (num_players == 0 && num_tournaments == 0){
+                print_rows(legend);
+              }
+
+            //saveToFile(printable_rows(legend), ("tournaments.csv"));
+          },
+          error: function() {
+              return console.log("error");
+          }
+      });
+    }
+
+    function print_rows(data){
+      printable_rows = [];
+      printable_rows[0] = "year,tournament,golfer,age,day1,day2,day3,day4,total,drivingDistance,drivingAccuracy,GIR,eagles,birdies,bogeys,";
+
+      for (var tournament in data){
+        for (var i = 0; i < 9; i++){
+          for (var player in data[tournament][i]["players"]){
+            output_string = "";
+            cell = data[tournament][i]["players"][player];
+
+            output_string += data[tournament][i]["Year"] + ",";
+            output_string += tournament + ",";
+            output_string += player + ",";
+            output_string += cell["age"] + ",";
+            output_string += cell["day1"] + ",";
+            output_string += cell["day2"] + ",";
+            output_string += cell["day3"] + ",";
+            output_string += cell["day4"] + ",";
+            output_string += cell["total"] + ",";
+            output_string += cell["DrivingDistance"] + ",";
+            output_string += cell["DrivingAccuracy"] + ",";
+            output_string += cell["GIR"] + ",";
+            output_string += cell["Eagles"] + ",";
+            output_string += cell["Birdies"] + ",";
+            output_string += cell["Bogeys"] + ",";
+            printable_rows.push(output_string)
+          }
+        }
+      }
+      saveToFile(printable_rows, "golfData.csv")
+    }
+
+    num_tournaments = 9 * 4;
+    num_players = 0; 
+
+    for (var tournament in legend){
+      for (var i = 0; i < legend[tournament].length; i++){
+        get_tournament(legend[tournament][i]["Year"], tournament, legend[tournament][i]["tournament"]);
+        }
+    }
+
+    /* takes an array of strings
+       and writes them line by line into a file given by filename
+     */
+    var saveToFile = function(arrayOfLines, fileName) {
+       /* adds linebreaks at the end*/
+       var blob, blobText;
+       blobText = arrayOfLines.map(function(d) {
+         if (d.endsWith("\n")) {
+           return d;
+         } else {
+           return d + "\n";
+         }
+       });
+       blob = new Blob(blobText, {
+         type: "text/plain;charset=utf-8"
+       });
+       return saveAs(blob, fileName);
+     };
+
+     String.prototype.endsWith = function(suffix) {
+       return this.indexOf(suffix, this.length - suffix.length) !== -1;
+     };
+	
+
+
+
+</script>
+
+
+</body>
+</html>
