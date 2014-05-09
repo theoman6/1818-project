@@ -89,15 +89,15 @@
             yMin = -yMax;
 
           yScale = d3.scale.linear().domain([yMax, yMin]).range([0,bbVis.h]);
-		  // example that translates to the bottom left of our vis space:
-		  var visFrame = svg.append("g").attr({
-		      "transform": "translate(" + bbVis.x + "," + bbVis.y + ")",
+          // example that translates to the bottom left of our vis space:
+          var visFrame = svg.append("g").attr({
+              "transform": "translate(" + bbVis.x + "," + bbVis.y + ")",
               "class": "visualization"
-		  	  //....
-			  
-		  })
+              //....
+              
+          })
           svg.attr("class", "dataArea");
-		  
+          
           var xAxis = d3.svg.axis()
             .scale(xScale)
             .orient("bottom");
@@ -181,8 +181,8 @@
 
 
 
-		  //....
-		  
+          //....
+          
 //        yScale = .. // define the right y domain and range -- use bbVis
 
 //        xAxis = ..
