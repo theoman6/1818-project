@@ -54,6 +54,17 @@
 
         return createVis("score_change");
     });
+    function name_maps(str){
+        map = {
+            "score_change": "Score Change After Cut", 
+            "total": "Total Score", 
+            "day1": "Day 1 Score",
+            "day2": "Day 2 Score",
+            "day3": "Day 3 Score",
+            "day4": "Day 4 Score"
+        };
+        return map[str];
+    };
 
     clear_details();
 
@@ -134,11 +145,12 @@
             .attr("transform", "translate(" + bbVis.x + "," + bbVis.h + ")")
             .call(xAxis)
             .append("text")
-                .attr("y", 6)
+                .attr("y", -20)
+                .attr("x", bbVis.x - 100 + bbVis.w)
                 .attr("dy", ".71em")
                 .style("text-anchor", "end")
                 .style("color", "darkgreen")
-                .text("age");
+                .text("Age");
 
           svg.append("g")
             .attr("class", "y axis visualization")
@@ -149,7 +161,7 @@
                 .attr("y", 6)
                 .attr("dy", ".71em")
                 .style("text-anchor", "end")
-                .text(feature);
+                .text(name_maps(feature));
 
 
 
@@ -173,7 +185,7 @@
                 .attr("r", 3)
                 .on("mouseover", function(d){
                     d3.selectAll(".golfer" + golfers.indexOf(d.golfer)).attr("r", "6").attr("fill", "red");
-                    d3.select("#details").html("<h3>" + d.golfer + " (age: " + (parseInt(d.year) - parseInt(dataSet[d.golfer]["birthyear"]) ) + ")</h3><h4>" + d.year + ": " + d.tournament + "</h4><h4>" + feature + ": " + d[feature] + "</h4>");
+                    d3.select("#details").html("<h3>" + d.golfer + " (age: " + (parseInt(d.year) - parseInt(dataSet[d.golfer]["birthyear"]) ) + ")</h3><h4>" + d.year + ": " + d.tournament + "</h4><h4>" + name_maps(feature) + ": " + d[feature] + "</h4>");
                 })
                 .on("mouseout", function(d){
                     if (currently_showing != d.golfer)
