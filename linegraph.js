@@ -55,6 +55,8 @@
         return createVis("score_change");
     });
 
+    clear_details();
+
     currently_showing = "";
 
     $("#mode").change(function(){
@@ -68,6 +70,14 @@
 
             tournaments = ["Masters", "US Open", "British Open", "PGA Championship"];
 
+
+    function get_value(d){
+        return parseInt(d.year) - parseInt(dataSet[d.golfer]["birthyear"]) + tournaments.indexOf(d.tournament)/4;
+    }
+
+    function clear_details(){
+        $("#details").html("<br><br><h3>Hover on any node for info</h3>");
+    }
 
     createVis = function(feature) {
         var xAxis, xScale, yAxis,  yScale;
@@ -96,9 +106,6 @@
 
 
 
-        function get_value(d){
-            return parseInt(d.year) - parseInt(dataSet[d.golfer]["birthyear"]) + tournaments.indexOf(d.tournament)/4;
-        }
 
 
 
@@ -166,7 +173,7 @@
                 .attr("r", 3)
                 .on("mouseover", function(d){
                     d3.selectAll(".golfer" + golfers.indexOf(d.golfer)).attr("r", "6").attr("fill", "red");
-                    d3.select("#details").html("<h4>" + d.golfer + "<h4><h5>" + d.year + ": " + d.tournament + "</h5><h5>" + feature + ": " + d[feature] + "</h5>");
+                    d3.select("#details").html("<h3>" + d.golfer + " (age: " + (parseInt(d.year) - parseInt(dataSet[d.golfer]["birthyear"]) ) + ")</h3><h4>" + d.year + ": " + d.tournament + "</h4><h4>" + feature + ": " + d[feature] + "</h4>");
                 })
                 .on("mouseout", function(d){
                     if (currently_showing != d.golfer)
@@ -174,7 +181,7 @@
                     else 
                         d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "6").attr("fill", "yellow");
 
-                    d3.select("#details").html("");
+                    clear_details();
                 })
 
             golfer_input = $("#golfer_input").autocomplete({
