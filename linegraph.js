@@ -66,10 +66,11 @@
         d3.selectAll(".visualization").remove();
     }
 
+            tournaments = ["Masters", "US Open", "British Open", "PGA Championship"];
+
+
     createVis = function(feature) {
         var xAxis, xScale, yAxis,  yScale;
-
-          xScale = d3.scale.linear().domain([2005,2014]).range([0, bbVis.w]);  // define the right domain generically
 
           yMax = 0;
           yMin = 1000; 
@@ -89,6 +90,21 @@
             yMin = -yMax;
 
           yScale = d3.scale.linear().domain([yMax, yMin]).range([0,bbVis.h]);
+
+        xMin = d3.min(nodes, get_value);
+        xMax = d3.max(nodes, get_value);
+
+
+
+        function get_value(d){
+            return parseInt(d.year) - parseInt(dataSet[d.golfer]["birthyear"]) + tournaments.indexOf(d.tournament)/4;
+        }
+
+
+
+        xScale = d3.scale.linear().domain([xMin,xMax]).range([0, bbVis.w]);  // define the right domain generically
+
+
           // example that translates to the bottom left of our vis space:
           var visFrame = svg.append("g").attr({
               "transform": "translate(" + bbVis.x + "," + bbVis.y + ")",
@@ -109,7 +125,13 @@
           svg.append("g")
             .attr("class", "x axis visualization")
             .attr("transform", "translate(" + bbVis.x + "," + bbVis.h + ")")
-            .call(xAxis);
+            .call(xAxis)
+            .append("text")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .style("color", "darkgreen")
+                .text("age");
 
           svg.append("g")
             .attr("class", "y axis visualization")
@@ -123,7 +145,6 @@
                 .text(feature);
 
 
-            tournaments = ["Masters", "US Open", "British Open", "PGA Championship"];
 
             golfers = Object.keys(dataSet); 
 
@@ -134,10 +155,10 @@
                     return "points " + "golfer" + golfers.indexOf(d.golfer);
                 })
                 .attr("fill", function(d, i){
-                    return "black";
+                    return "white";
                 })
                 .attr("cx", function(d, i){
-                    return xScale(parseInt(d.year) + (tournaments.indexOf(d.tournament) / 4));
+                    return xScale(get_value(d));
                 })
                 .attr("cy", function(d, i){
                     return yScale(d[feature]) - bbVis.y;
@@ -149,9 +170,9 @@
                 })
                 .on("mouseout", function(d){
                     if (currently_showing != d.golfer)
-                        d3.selectAll(".golfer" + golfers.indexOf(d.golfer)).attr("r", "3").attr("fill", "black");
+                        d3.selectAll(".golfer" + golfers.indexOf(d.golfer)).attr("r", "3").attr("fill", "white");
                     else 
-                        d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "6").attr("fill", "blue");
+                        d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "6").attr("fill", "yellow");
 
                     d3.select("#details").html("");
                 })
@@ -164,10 +185,10 @@
             $("#show_golfer").click(function(){
                 golfer = $("#golfer_input").val();
 
-                d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "3").attr("fill", "black");
+                d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "3").attr("fill", "white");
 
                 if (golfer != currently_showing){
-                    d3.selectAll(".golfer" + golfers.indexOf(golfer)).attr("r", "6").attr("fill", "blue");
+                    d3.selectAll(".golfer" + golfers.indexOf(golfer)).attr("r", "6").attr("fill", "yellow");
                     currently_showing = golfer; 
                 }
                 else 
