@@ -184,14 +184,14 @@
                 })
                 .attr("r", 3)
                 .on("mouseover", function(d){
-                    d3.selectAll(".golfer" + golfers.indexOf(d.golfer)).attr("r", "6").attr("fill", "red");
+                    d3.selectAll(".golfer" + golfers.indexOf(d.golfer)).attr("r", "6").attr("fill", "yellow");
                     d3.select("#details").html("<h3>" + d.golfer + " (age: " + (parseInt(d.year) - parseInt(dataSet[d.golfer]["birthyear"]) ) + ")</h3><h4>" + d.year + ": " + d.tournament + "</h4><h4>" + name_maps(feature) + ": " + d[feature] + "</h4>");
                 })
                 .on("mouseout", function(d){
                     if (currently_showing != d.golfer)
                         d3.selectAll(".golfer" + golfers.indexOf(d.golfer)).attr("r", "3").attr("fill", "white");
                     else 
-                        d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "6").attr("fill", "yellow");
+                        d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "6").attr("fill", "red");
 
                     clear_details();
                 })
@@ -207,7 +207,7 @@
                 d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "3").attr("fill", "white");
 
                 if (golfer != currently_showing){
-                    d3.selectAll(".golfer" + golfers.indexOf(golfer)).attr("r", "6").attr("fill", "yellow");
+                    d3.selectAll(".golfer" + golfers.indexOf(golfer)).attr("r", "6").attr("fill", "red");
                     currently_showing = golfer; 
                 }
                 else 
