@@ -91,7 +91,6 @@
     }
 
     createVis = function(feature) {
-        currently_showing = "";
         var xAxis, xScale, yAxis,  yScale;
 
           yMax = 0;
@@ -204,6 +203,9 @@
 
             $("#show_golfer").click(function(){
                 golfer = $("#golfer_input").val();
+
+                console.log(golfer);
+                console.log(currently_showing);
 
                 d3.selectAll(".golfer" + golfers.indexOf(currently_showing)).attr("r", "3").attr("fill", "white");
 
