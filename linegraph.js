@@ -91,6 +91,7 @@
     }
 
     createVis = function(feature) {
+        currently_showing = "";
         var xAxis, xScale, yAxis,  yScale;
 
           yMax = 0;
